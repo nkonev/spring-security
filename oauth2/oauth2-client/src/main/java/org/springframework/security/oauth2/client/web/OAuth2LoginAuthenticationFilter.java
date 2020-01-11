@@ -102,6 +102,9 @@ public class OAuth2LoginAuthenticationFilter extends AbstractAuthenticationProce
 	private OAuth2AuthorizedClientRepository authorizedClientRepository;
 	private AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository =
 		new HttpSessionOAuth2AuthorizationRequestRepository();
+	private String host;
+	private Integer port;
+	private String schema;
 
 	/**
 	 * Constructs an {@code OAuth2LoginAuthenticationFilter} using the provided parameters.
@@ -170,8 +173,19 @@ public class OAuth2LoginAuthenticationFilter extends AbstractAuthenticationProce
 					"Client Registration not found with Id: " + registrationId, null);
 			throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
 		}
-		String redirectUri = UriComponentsBuilder.fromHttpUrl(UrlUtils.buildFullRequestUrl(request))
-				.replaceQuery(null)
+		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
+				.fromHttpUrl(UrlUtils.buildFullRequestUrl(request))
+				.replaceQuery(null);
+		if (host!=null) {
+			uriComponentsBuilder.host(host);
+		}
+		if (port != null) {
+			uriComponentsBuilder.port(port);
+		}
+		if (schema != null) {
+			uriComponentsBuilder.scheme(schema);
+		}
+		String redirectUri = uriComponentsBuilder
 				.build()
 				.toUriString();
 		OAuth2AuthorizationResponse authorizationResponse = OAuth2AuthorizationResponseUtils.convert(params, redirectUri);
